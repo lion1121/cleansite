@@ -9,9 +9,12 @@ var gulp = require('gulp'),
     uglify = require('gulp-uglifyjs'), // Подключаем gulp-uglifyjs (для сжатия JS)
     cssnano = require('gulp-cssnano'), // Подключаем пакет для минификации CSS
     rename = require('gulp-rename'), // Подключаем библиотеку для переименования файлов
-    del = require('del');  // Подключаем библиотеку для удаления файлов и папок
+    del = require('del'),  // Подключаем библиотеку для удаления файлов и папок
+    pug = require('gulp-pug');
 
-gulp.task('sass', function(){ // Создаем таск "sass"
+
+
+    gulp.task('sass', function(){ // Создаем таск "sass"
     return gulp.src('app/scss/**/*.scss') // Берем все sass файлы из папки sass и дочерних, если таковые будут
         .pipe(sass()) // Преобразуем Sass в CSS посредством gulp-sass
         .pipe(gulp.dest('app/css')) // Выгружаем результата в папку app/css
@@ -19,14 +22,23 @@ gulp.task('sass', function(){ // Создаем таск "sass"
 
 });
 
+    gulp.task('pug', function(){
+        gulp.src('app/pug/*.pug')
+            .pipe(pug())
+            .pipe(gulp.dest('app/'))
+    });
+
 gulp.task('browser-sync', function() { // Создаем таск browser-sync
     browserSync({ // Выполняем browser Sync
         server: { // Определяем параметры сервера
-            baseDir: 'app' // Директория для сервера - app
+            baseDir: 'app/' // Директория для сервера - app
         },
         notify: false // Отключаем уведомления
     });
 });
+
+
+
     gulp.task('css-min', ['sass'], function() {
         return gulp.src('app/css/main.css') // Выбираем файл для минификации
             .pipe(cssnano()) // Сжимаем
@@ -35,8 +47,9 @@ gulp.task('browser-sync', function() { // Создаем таск browser-sync
     });
 
 
-    gulp.task('watch', ['browser-sync', 'sass', 'scripts', 'css-min'], function () {
+    gulp.task('watch', ['browser-sync', 'pug', 'sass', 'scripts', 'css-min'], function () {
     gulp.watch('app/scss/**/*.scss', ['sass']);
+    gulp.watch('app/pug/*.pug',['pug']);
     gulp.watch('app/*.html', browserSync.reload);
     gulp.watch('app/js/**/*.js', browserSync.reload);
 });
